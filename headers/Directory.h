@@ -37,6 +37,7 @@
 #include <stdlib.h>
 
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <map>
 #include <thread>
@@ -59,6 +60,10 @@
 #include "sky.ppm"
 #include "sprites.ppm"
 
+//surface colors
+float groundRed, groundBlue, groundGreen;
+float wallRed, wallBlue, wallGreen;
+float ceilingRed, ceilingBlue, ceilingGreen;
 
 
 //CMATH

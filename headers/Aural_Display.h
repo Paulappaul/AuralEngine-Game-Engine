@@ -321,13 +321,14 @@ void init()
     playerDeltaY = -sin(degToRad(playerAngle));
 
     // Initialize the spriteData vector in the current MapData instance
-    thisSession.worldMaps.at(thisSession.currentMap)->spriteData = 
+  /* thisSession.worldMaps.at(thisSession.currentMap)->spriteData =
     {
         {1, 1, 0, 10 * 64, 10 * 64, 20, 0}, // key
         {2, 1, 1, 1.5 * 64, 4.5 * 64, 20,1}, // light 1
         {2, 1, 1, 3.5 * 64, 4.5 * 64, 20,2}, // light 2
         {3, 1, 2, 2.5 * 64, 2 * 64, 20, 3} // enemy
     };
+    */
 }
 
 
@@ -341,15 +342,16 @@ void resize(int w, int h)
 void drawFloorCeilingSolidColor()
 {
     
-        glColor3f(0, 1, 1);
+        glColor3f(ceilingRed, ceilingGreen, ceilingBlue);
         glBegin(GL_QUADS);
         glVertex2i(0, screenHeight /2);
         glVertex2i(screenWidth, screenHeight /2);
         glVertex2i(screenWidth, 0);
         glVertex2i(0, 0);
         glEnd();
-
-        glColor3f(0, 0, 1);
+        
+        //floor
+        glColor3f(groundRed, groundBlue, groundGreen);
         glBegin(GL_QUADS);
         glVertex2i(0, screenHeight);
         glVertex2i(screenWidth, screenHeight);
@@ -477,7 +479,7 @@ void drawRays2D()
         }
 
         float shade = 0.5;
-        glColor3f(0, 0.8, 0);           // color
+        glColor3f(wallRed, wallGreen, wallBlue);           // color
 
         if (disV < disH)                // horizontal hit first check this
         {
@@ -486,7 +488,7 @@ void drawRays2D()
             rayX = verticalX;
             rayY = verticalY;
             disH = disV;
-            glColor3f(0, 0.5, 0); // shade color
+            glColor3f(wallRed, wallGreen -0.2, wallBlue); // shade color
         }
 
 

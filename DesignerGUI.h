@@ -23,9 +23,9 @@ enum EVENTS
 
 struct MapData
 {
-    int newMap[576];
-    int ceilingMap[576];
-    int floorMap[576];
+    int newMap[576] = { 0 };        // Initialize all elements to 0
+    int ceilingMap[576] = { 0 };    // Initialize all elements to 0
+    int floorMap[576] = { 0 };      // Initialize all elements to 0
     std::vector<std::vector<int>> positions; // Vector to store X, Y, PlayerX, PlayerY, and destination map index
     std::vector<sprite>spriteData;
     std::vector<int> ppmData;
@@ -704,14 +704,212 @@ void solidColorCallback(Fl_Widget* widget, void* data)
     }
 }
 
-void colorValueCallback(Fl_Widget* widget, void* data)
+enum colorState
 {
+    WALL,
+    FLOOR,
+    CEILING
+
+};
 
 
 
+void redColorValueCallback(Fl_Widget* widget, void* data)
+{
+    int state = reinterpret_cast<int>(data);
+    Fl_Value_Input* Widget = dynamic_cast<Fl_Value_Input*>(widget);
+
+    if (state == WALL)
+    {
+       wallRed = Widget->value();
+
+    }
+    else if (state == FLOOR)
+    {
+        groundRed = Widget->value();
+
+    }
+    else if (state == CEILING)
+    {
+        ceilingRed =  Widget->value();
+
+    }
 
 }
 
+void greenColorValueCallback(Fl_Widget* widget, void* data)
+{
+    int state = reinterpret_cast<int>(data);
+    Fl_Value_Input* Widget = dynamic_cast<Fl_Value_Input*>(widget);
+
+    if (state == WALL)
+    {
+        wallGreen = Widget->value();
+
+    }
+    else if (state == FLOOR)
+    {
+        groundGreen = Widget->value();
+
+    }
+    else if (state == CEILING)
+    {
+        ceilingGreen = Widget->value();
+
+    }
+
+}
+
+
+void blueColorValueCallback(Fl_Widget* widget, void* data)
+{
+    int state = reinterpret_cast<int>(data);
+    Fl_Value_Input* Widget = dynamic_cast<Fl_Value_Input*>(widget);
+
+    if (state == WALL)
+    {
+        wallBlue = Widget->value();
+
+    }
+    else if (state == FLOOR)
+    {
+        groundBlue= Widget->value();
+
+    }
+    else if (state == CEILING)
+    {
+        ceilingBlue= Widget->value();
+
+    }
+
+}
+
+/*
+void saveData(const std::string& filename)
+{
+    std::ofstream outputFile(filename);
+
+    for (size_t mapIndex = 0; mapIndex < thisSession.worldMaps.size(); ++mapIndex) {
+        outputFile << "MapIndex: " << mapIndex << " MapName: " << thisSession.mapNames[mapIndex] << std::endl;
+
+        const MapData* map = thisSession.worldMaps[mapIndex];
+
+        // Write newMap, ceilingMap, and floorMap arrays
+        for (int i = 0; i < 576; ++i)
+        {
+            outputFile << map->newMap[i] << " " << map->ceilingMap[i] << " " << map->floorMap[i] << " ";
+        }
+        outputFile << std::endl;
+
+        // Write positions
+        for (const std::vector<int>& position : map->positions) 
+        {
+            for (int val : position) {
+                outputFile << val << " ";
+            }
+            outputFile << std::endl;
+        }
+
+        // Write spriteData
+        for (const sprite& sp : map->spriteData) 
+        {
+            outputFile << sp.type << " " << sp.state << " " << sp.map << " "
+                << sp.x << " " << sp.y << " " << sp.z << " " << sp.dialogueMarker << std::endl;
+        }
+
+        outputFile << std::endl; // Separate maps
+    }
+
+    outputFile.close();
+}
+*/
+
+// Function to save data to a text file
+void saveData(const std::string& filename)
+{
+    std::ofstream outFile(filename);
+
+    if (!outFile)
+    {
+        std::cerr << "Error opening file for writing: " << filename << std::endl;
+        return;
+    }
+
+    // Write the size of worldMaps vector
+    size_t numWorldMaps = thisSession.worldMaps.size();
+    outFile << numWorldMaps << std::endl;
+
+    // Iterate through worldMaps vector
+    for (size_t mapIndex = 0; mapIndex < numWorldMaps; ++mapIndex)
+    {
+        // Write mapNames corresponding to the current map
+        outFile << thisSession.mapNames.at(mapIndex) << std::endl;
+
+        // Write MapData struct
+        MapData* mapData = thisSession.worldMaps.at(mapIndex);
+        outFile.write(reinterpret_cast<const char*>(mapData), sizeof(MapData));
+        outFile << std::endl;
+    }
+
+    outFile.close();
+}
+
+
+
+
+
+void saveButtonCallback(Fl_Widget* widget, void* Data)
+{
+
+    const std::string fileName =  "C:\\Users\\alcin\\Desktop\\testFile.txt";
+    saveData(fileName);
+
+}
+
+void loadData(const std::string& filename)
+{
+    std::ifstream inFile(filename);
+
+    if (!inFile)
+    {
+        std::cerr << "Error opening file for reading: " << filename << std::endl;
+        return;
+    }
+
+    thisSession.worldMaps.clear();
+    thisSession.mapNames.clear();
+
+    size_t numWorldMaps;
+    inFile >> numWorldMaps;
+    inFile.ignore(); // Ignore the newline character after the number
+
+    for (size_t i = 0; i < numWorldMaps; ++i)
+    {
+        std::string mapName;
+        std::getline(inFile, mapName);
+
+        MapData* mapData = new MapData();
+        inFile.read(reinterpret_cast<char*>(mapData), sizeof(MapData));
+        inFile.ignore(); // Ignore the newline character after the struct data
+
+        thisSession.worldMaps.push_back(mapData);
+        thisSession.mapNames.push_back(mapName);
+    }
+
+    inFile.close();
+}
+
+
+
+
+
+void loadButtonCallback(Fl_Widget* widget, void* data)
+{
+    std::string fileName = "C:\\Users\\alcin\\Desktop\\testFile.txt";
+    loadData(fileName);
+
+
+}
 
 void designerGui()
 {
@@ -776,14 +974,17 @@ void designerGui()
     redInput->label("RED");
     redInput->align(FL_ALIGN_BOTTOM);
     redInput->soft(true);
+    redInput->callback(redColorValueCallback, reinterpret_cast<void*>(2));
 
     Fl_Value_Input* blueInput = new Fl_Value_Input(840, 234, 120, 30);
     blueInput->label("BLUE");
     blueInput->align(FL_ALIGN_BOTTOM);
+    blueInput->callback(blueColorValueCallback, reinterpret_cast<void*>(2));
 
     Fl_Value_Input* greenInput = new Fl_Value_Input(960, 234, 120, 30);
     greenInput->label("GREEN");
     greenInput->align(FL_ALIGN_BOTTOM);
+    greenInput->callback(greenColorValueCallback, reinterpret_cast<void*>(2));
 
     //Wall
     Fl_Box* wallLabel = new Fl_Box(600, 264, 120, 30, "WALL:");
@@ -791,14 +992,17 @@ void designerGui()
     Fl_Value_Input* wredInput = new Fl_Value_Input(720, 264, 120, 30);
     wredInput->label("RED");
     wredInput->align(FL_ALIGN_BOTTOM);
+    wredInput->callback(redColorValueCallback, reinterpret_cast<void*>(0));
 
     Fl_Value_Input* wblueInput = new Fl_Value_Input(840, 264, 120, 30);
     wblueInput->label("BLUE");
     wblueInput->align(FL_ALIGN_BOTTOM);
+    wblueInput->callback(blueColorValueCallback, reinterpret_cast<void*>(0));
 
     Fl_Value_Input* wgreenInput = new Fl_Value_Input(960, 264, 120, 30);
     wgreenInput->label("GREEN");
     wgreenInput->align(FL_ALIGN_BOTTOM);
+    wgreenInput->callback(greenColorValueCallback, reinterpret_cast<void*>(0));
 
     //Floor
     Fl_Box* floorLabel = new Fl_Box(600, 294, 120, 30, "FLOOR:");
@@ -806,14 +1010,27 @@ void designerGui()
     Fl_Value_Input* fredInput = new Fl_Value_Input(720, 294, 120, 30);
     fredInput->label("RED");
     fredInput->align(FL_ALIGN_BOTTOM);
+    fredInput->callback(redColorValueCallback);
+    fredInput->callback(redColorValueCallback, reinterpret_cast<void*>(1));
 
     Fl_Value_Input* fblueInput = new Fl_Value_Input(840, 294, 120, 30);
     fblueInput->label("BLUE");
     fblueInput->align(FL_ALIGN_BOTTOM);
+    fblueInput->callback(blueColorValueCallback, reinterpret_cast<void*>(1));
 
     Fl_Value_Input* fgreenInput = new Fl_Value_Input(960, 294, 120, 30);
     fgreenInput->label("GREEN");
     fgreenInput->align(FL_ALIGN_BOTTOM);
+    fgreenInput->callback(greenColorValueCallback, reinterpret_cast<void*>(1));
+
+
+
+    //save and load
+    Fl_Button* saveButton = new Fl_Button(960, 500, 120, 30, "save");
+    saveButton->callback(saveButtonCallback);
+
+    Fl_Button* loadButton = new  Fl_Button(720, 500, 120, 30, "load");
+    loadButton->callback(loadButtonCallback);
 
     fltkWindow->end();
     fltkWindow->show();
