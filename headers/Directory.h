@@ -209,7 +209,6 @@ enum textures
     Wall,
     Floor,
     Ceiling,
-
 };
 
 typedef struct          //All veriables per sprite
@@ -225,5 +224,4 @@ enum EVENTS
 {
     Portal,
     Dialogue
-
 };

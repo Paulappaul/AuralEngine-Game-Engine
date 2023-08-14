@@ -552,7 +552,7 @@ void confirmDialogueEventCallback(Fl_Widget* widget, void* data)
     popUpWindow->hide();
 
     // Add the X and Y values to the positions vector of the current map
-   thisSession.worldMaps.at(thisSession.currentMap)->addPosition(x, y, 0, 0, selectedValue, 1);
+   thisSession.worldMaps.at(thisSession.currentMap)->addPosition(x, y, 0, 0, selectedValue, Dialogue);
 
     std::cout << "x: " << x << "y: " << y << std::endl;
     std::cout << "selected value: " << selectedValue << std::endl;

@@ -1093,9 +1093,6 @@ void ButtonDown(unsigned char key, int x, int y)
         }
     }
 
-
-
-
     if (key == 'a')
     {
         Keys.turnLeft = 1;
