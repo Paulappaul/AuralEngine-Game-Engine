@@ -1,4 +1,7 @@
 #pragma once
+//REMOVED ALGORITHM, Assert
+
+//Wwise Headers
 #include <stdafx.h>
 #include <AkSoundEngineDLL.h>
 #include <IAkStreamMgr.h>
@@ -16,49 +19,46 @@
 #include <AkFilePackageLUT.h>
 #include <AkFilePackage.h>
 #include <AkGeneratedSoundBanksResolver.h>
-#include <AK/SpatialAudio/Common/AkSpatialAudio.h> //
-#include<assert.h>
-#include <algorithm> //do we need?
-#include<vector>
-
-#include "Wwise_IDs.h"
-
-#include <cmath>
-
+#include <AK/SpatialAudio/Common/AkSpatialAudio.h> 
 #include <AkFileLocationBase.h>
 #include <AkPlatformProfilerHooks.h>
 #include <AkJobWorkerMgr.h>
 #include <AkTypes.h>
+#include "Wwise_IDs.h"
 
+//Windows Stuff
 #include <Windows.h>
 #include <GL\glew.h>
 #include <GL\freeglut.h>
+
+//Standard Library stuff
+#include <cmath>
 #include <iostream>
 #include <stdlib.h>
-
+#include<vector>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <map>
 #include <thread>
 
+//FLTK
 #include "FL/Fl.H"
 #include "FL//Fl_Window.H"
 #include "FL/Fl_Button.H"
 #include <FL/Fl_Dial.H>
 #include "FL/Fl_Box.H"
 #include "FL/Fl_Choice.H"
-
 #include <FL/Fl_Value_Input.H>
-
-
 #include <FL/Fl_File_Chooser.H>
 
-
+//Graphics
 #include "Metal.ppm"
 #include "All_Textures1.ppm"
 #include "sky.ppm"
 #include "sprites.ppm"
+
+/*******************************************************************************************GLOBAL VARIABLES*****************************************************************************************************/
 
 //surface colors
 float groundRed, groundBlue, groundGreen;
@@ -75,7 +75,6 @@ float ceilingRed, ceilingBlue, ceilingGreen;
 
 bool prototypeTexture = false;
 bool drawSolidColorTextures = false;
-
 
 //Visual Defines
 #define PI 3.1415926532
@@ -104,6 +103,7 @@ extern const int mapSquareSize;
 extern float z;                                         // Variable for Spatial Audio
 extern float playerX, playerY;
 extern float playerDeltaX, playerDeltaY, playerAngle;
+
 bool loadScreenTimerSet = false;
 
 bool skynew = false;
@@ -114,6 +114,9 @@ extern const int screenWidth;
 
 extern float degToRad(float a);
 extern float fixAngle(float a);
+
+
+/**********************************************************************************************HEADER FUNCTIONS AND STRUCTURES************************************************************************************/
 
 
 /* Aural_Display */
@@ -149,7 +152,14 @@ extern const int Map[];
 
 //DesignerGui
 
+extern struct sessionData;
+extern struct MapData;
+extern struct PositionWindowData;
+extern struct SpriteWindowData;
+extern struct DialogueWindowData;
+
 std::vector<std::vector<Fl_Button*>> gridButtons(mapX, std::vector<Fl_Button*>(mapY));
+std::vector<int> loadPPM(const std::string& filename);
 
 extern void intializeGUI();
 extern void designerGui();
@@ -167,8 +177,22 @@ extern void selectButtonCallback(Fl_Widget* widget, void* data);
 extern void portalMovement(Fl_Widget* widget, void* data);
 extern void mapBackCallback(Fl_Widget* widget, void* data);
 extern void mapForwardCallback(Fl_Widget* widget, void* data);
-
-
+extern void confirmSpriteCallback(Fl_Widget* widget, void* data);
+extern void addSpriteCallback(Fl_Widget* widget, void* data);
+extern void confirmDialogueEventCallback(Fl_Widget* widget, void* data);
+extern void dialogueEventCallback(Fl_Widget* widget, void* data);
+extern void setPlayerLocation(Fl_Widget* widget, void* data);
+extern void dialogueRefreshCallback(Fl_Widget* widget, void* data);
+extern void newSkyCallback(Fl_Widget* widget, void* data);
+extern void protoTexCallback(Fl_Widget* widget, void* data);
+extern void solidColorCallback(Fl_Widget* widget, void* data);
+extern void redColorValueCallback(Fl_Widget* widget, void* data);
+extern void greenColorValueCallback(Fl_Widget* widget, void* data);
+extern void blueColorValueCallback(Fl_Widget* widget, void* data);
+extern void saveData(const std::string& filename);
+extern void saveData(const std::string& filename);
+extern void loadData(const std::string& filename);
+extern void loadButtonCallback(Fl_Widget* widget, void* data);
 
 enum GameState
 {
@@ -180,7 +204,15 @@ enum GameState
 
 }; GameState gameState = threeDimensionalDisplay;
 
-typedef struct       //All veriables per sprite
+enum textures
+{
+    Wall,
+    Floor,
+    Ceiling,
+
+};
+
+typedef struct          //All veriables per sprite
 {
     int type;           //static, key, enemy
     int state;          //on off
@@ -188,3 +220,10 @@ typedef struct       //All veriables per sprite
     float x, y, z;      //position
     int dialogueMarker;
 }sprite;
+
+enum EVENTS
+{
+    Portal,
+    Dialogue
+
+};

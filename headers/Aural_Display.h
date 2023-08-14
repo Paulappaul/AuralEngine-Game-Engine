@@ -15,9 +15,6 @@ typedef struct
 
 float frame1, frame2, fps;
 
-int SkyR = 0;
-int SkyG = 0;
-int SkyB = 0;
 int Counter = 0;
 
 int const mapX = 24;
@@ -33,10 +30,6 @@ const int screenWidth = 1920;
 float playerDeltaX, playerDeltaY, playerAngle;
 
 float z = 1.0; // for Spatial Audio
-
-
-//bool mapChange = false;
-
 
 float degToRad(float a) { return a * PI / 180.0; }
 float fixAngle(float a) { if (a > 359) { a -= 360; } if (a < 0) { a += 360; } return a; }
@@ -112,11 +105,6 @@ void drawSprite()
         }
     }
 }
-
-
-    
-
-
 
 
 void loadDialogueFromFile(const std::string& filename, std::map<int, std::string>& dialogueMap)
@@ -370,7 +358,6 @@ void drawRays2D()
 
     }
 
-
     int ray, mx, my, mapPosition, dof, side;
     float verticalX, verticalY, rayX, rayY, rayAngle, xOffset, yOffset, disV, disH;
 
@@ -380,7 +367,7 @@ void drawRays2D()
     {
         int vmt = 0, hmt = 0;                                                       // vertical and horizontal map texture number
 
-        //---Vertical---
+        //-------------------------------Vertical Check-----------------------------//
         dof = 0;
         side = 0;
         disV = 100000;
@@ -433,7 +420,7 @@ void drawRays2D()
         verticalX = rayX;
         verticalY = rayY;
 
-        /*---------------------------------------------Horizontal Check--------------------------------------------------*/
+        //---------------------------------------------Horizontal Check----------------------------------------//
         dof = 0;
         disH = 100000;
         Tan = 1.0 / Tan;
@@ -479,19 +466,19 @@ void drawRays2D()
         }
 
         float shade = 0.5;
-        glColor3f(wallRed, wallGreen, wallBlue);           // color
+        glColor3f(wallRed, wallGreen, wallBlue);                       // color
 
-        if (disV < disH)                // horizontal hit first check this
+        if (disV < disH)                                               // horizontal hit first check this
         {
             hmt = vmt;
             shade = 0.25;
             rayX = verticalX;
             rayY = verticalY;
             disH = disV;
-            glColor3f(wallRed, wallGreen -0.2, wallBlue); // shade color
+            glColor3f(wallRed -0.2, wallGreen -0.2, wallBlue -0.2); // shade color
         }
 
-
+        ///*******************2D Map Rav Visualizer*******************///
         /*
         glLineWidth(2);
         glBegin(GL_LINES);
@@ -499,24 +486,25 @@ void drawRays2D()
         glVertex2i(rayX, rayY);
         glEnd(); // draw 2D ray
         */
+        ///***********************************************************///
 
         int ca = fixAngle(playerAngle - rayAngle);
-        disH = disH * cos(degToRad(ca)); // Fix fisheye
+        disH = disH * cos(degToRad(ca));                             // Fix fisheye
         int lineH = (mapSquareSize * screenHeight) / disH;
         float ty_step = 32.0 / static_cast<float>(lineH);
         float ty_off = 0;
 
-        if (lineH > screenHeight)                           // Line height and limit
+        if (lineH > screenHeight)                                    // Line height and limit
         {
             ty_off = (lineH - screenHeight) / 2.0;
             lineH = screenHeight;
         }
 
-        int lineOff = screenHeight / 2 - (lineH >> 1);     // Line offset, controls the Heigh of the Camera too. 
+        int lineOff = screenHeight / 2 - (lineH >> 1);               // Line offset, controls the Height of the Camera too. 
 
-        depth[ray] = disH;                                 //save line depth for Sprites
+        depth[ray] = disH;                                           //save line depth for Sprites
 
-        // ---Draw walls---
+        // -----------------------Draw walls------------------------ //
         int y;
         float ty = ty_off * ty_step; //+ hmt * 32;
       
@@ -541,7 +529,7 @@ void drawRays2D()
             }
         }
 
-        // Draw vertical wall, the IF statement control the color of the TextureMap
+        // -- Three Modes: Textured, ProtoType Texture, Solid Colors -- //
 
         for (y = 0; y < lineH; y++)
         {
@@ -577,7 +565,7 @@ void drawRays2D()
             {
                 //Code for Textured surfaces
                 //also dont forget to strike * hmt 32 above
-                int pixel = ((int)ty * 32 + (int)tx) * 3 + (hmt * 32 * 32 * 3); // 32 32 *3 represents number of pictures in each texture
+                int pixel = ((int)ty * 32 + (int)tx) * 3 + (hmt * 32 * 32 * 3);         // 32 32 *3 represents number of pictures in each texture
                 int red = ALL_TEXTURES1[pixel + 0] * shade;
                 int green = ALL_TEXTURES1[pixel + 1] * shade;
                 int blue = ALL_TEXTURES1[pixel + 2] * shade;
@@ -591,20 +579,23 @@ void drawRays2D()
             }
         }
 
+
+        /**************************Draw Floor and Ceiling*********************************/
         for (y = lineOff + lineH; y < screenHeight; y++)
         {
             float dy = y - (screenHeight / 2.0);
             float deg = degToRad(rayAngle);
             float raFix = cos(degToRad(fixAngle(playerAngle - rayAngle)));
-            tx = playerX / 2 + cos(deg) * 158 * 2 * 64 / dy / raFix; // determines floor and ceiling tile size
+            tx = playerX / 2 + cos(deg) * 158 * 2 * 64 / dy / raFix;                    // determines floor and ceiling tile size
             ty = playerY / 2 - sin(deg) * 158 * 2 * 64 / dy / raFix;
 
 
 
-            // ---Draw floors---
+            // ------------------------Draw floors---------------------------//
+
             if(prototypeTexture == true)
             {            
-                      // Ensure ty and tx are within the valid range of texture indices (0 to 255)
+             // Ensure ty and tx are within the valid range of texture indices (0 to 255)
             int tyIndex = static_cast<int>(ty / 96.0);
             int txIndex = static_cast<int>(tx / 96.0);
 
@@ -642,9 +633,9 @@ void drawRays2D()
             else
             {
                 int mp = thisSession.worldMaps[thisSession.currentMap]->floorMap[(int)(ty / 32.0) * mapX + (int)(tx / 32.0)] * 32 * 32;
-                float c = All_Textures[(static_cast<int>(ty) & 31) * 32 + (static_cast<int>(tx) & 31) + mp] * 0.7; // moving 32 spaces moves to the next tile set
+                float c = All_Textures[(static_cast<int>(ty) & 31) * 32 + (static_cast<int>(tx) & 31) + mp] * 0.7;                          // moving 32 spaces moves to the next tile set
 
-                int pixel = (((int)(ty) & 31) * 32 + ((int)(tx) & 31)) * 3 + mp * 3; // 32 32 *3 represents number of pictures in each texture
+                int pixel = (((int)(ty) & 31) * 32 + ((int)(tx) & 31)) * 3 + mp * 3;                                                        // 32 32 *3 represents number of pictures in each texture
                 int red = ALL_TEXTURES1[pixel + 0] * 0.25;
                 int green = ALL_TEXTURES1[pixel + 1] * 0.25;
                 int blue = ALL_TEXTURES1[pixel + 2] * 0.25;
@@ -654,9 +645,9 @@ void drawRays2D()
                 glVertex2i(ray * 16, y);
                 glEnd();
 
-                // ---Draw ceiling---
+                // -----------------------------------------------------Draw ceiling-------------------------------------------------------- //
                 int mpCeiling = thisSession.worldMaps[thisSession.currentMap]->ceilingMap[(int)(ty / 32.0) * mapX + (int)(tx / 32.0)] * 32 * 32;
-                pixel = (((int)(ty) & 31) * 32 + ((int)(tx) & 31)) * 3 + mpCeiling * 3; // 32 32 *3 represents number of pictures in each texture
+                pixel = (((int)(ty) & 31) * 32 + ((int)(tx) & 31)) * 3 + mpCeiling * 3;                                                     // 32 32 *3 represents number of pictures in each texture
                 red = ALL_TEXTURES1[pixel + 0] * 0.25;
                 green = ALL_TEXTURES1[pixel + 1] * 0.25;
                 blue = ALL_TEXTURES1[pixel + 2] * 0.25;
@@ -674,7 +665,7 @@ void drawRays2D()
         }
 
 
-        rayAngle = fixAngle(rayAngle - 0.5);                                                                // Go to next ray, incrementing by 0.5. There are 120 Rays total covering a 60 degree POV
+        rayAngle = fixAngle(rayAngle - 0.5);                                                                                                  // Go to next ray, incrementing by 0.5. There are 120 Rays total covering a 60 degree POV
     }
 }
 

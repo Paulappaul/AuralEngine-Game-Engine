@@ -1,11 +1,16 @@
 calfresh
 tape machines sell 
-Aural Engine Save / load option, hide buttons
 
 Github Research 
 Restaurant POS plan
 exercise 
-update website resume
-https://youtu.be/sb1FtMYAcYQ?t=511
 
+https://youtu.be/sb1FtMYAcYQ?t=511
 path modificaiton researh
+
+moog research
+
+cosmo: mac port
+cosmo: play during record
+cosmo: clock repair
+cosmo: rotation matrix

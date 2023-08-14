@@ -5,22 +5,6 @@
 #include <FL/Fl_Input.H>
 #include <FL/fl_ask.H>
 
-
-enum textures
-{
-    Wall,
-    Floor,
-    Ceiling,
-
-};
-
-enum EVENTS
-{
-    Portal,
-    Dialogue
-
-};
-
 struct MapData
 {
     int newMap[576] = { 0 };        // Initialize all elements to 0
@@ -30,13 +14,13 @@ struct MapData
     std::vector<sprite>spriteData;
     std::vector<int> ppmData;
     // Function to add a new position to the positions vector
+
     void addPosition(int x, int y, int playerX, int playerY, int destinationMapIndex, int eventFLAG)
     {
         positions.push_back({ x, y, playerX, playerY, destinationMapIndex, eventFLAG });
     }
 
 };
-
 
 struct sessionData
 {
@@ -61,7 +45,6 @@ struct sessionData
     }
 
 }; sessionData thisSession;
-
 
 
 // Callback function for the Check Button
@@ -351,6 +334,7 @@ void newWorldMap(Fl_Widget* widget, void* data)
     }
 }
 
+//annoying struct to pass through all our objects
 struct PositionWindowData
 {
     int selectedIndex; // The selected destination map index
@@ -471,6 +455,7 @@ void mapForwardCallback(Fl_Widget* widget, void* data)
     }
 }
 
+//another annoying struct to pass our objects through to another function 
 struct SpriteWindowData
 {
     Fl_Input* typeInput; // Pointer to the Type input widget
@@ -541,7 +526,7 @@ void addSpriteCallback(Fl_Widget* widget, void* data)
 }
 
 
-
+//another annoying struct to smuggle our objects
 struct DialogueWindowData
 {
     Fl_Choice* dialogueChoice; // Pointer to the dropdown menu
@@ -645,10 +630,6 @@ std::vector<int> loadPPM(const std::string& filename)
     return pixelValues;
 }
 
-
-
-
-
 void newSkyCallback(Fl_Widget* widget, void* data)
 {
     // Create a file chooser
@@ -704,32 +685,22 @@ void solidColorCallback(Fl_Widget* widget, void* data)
     }
 }
 
-enum colorState
-{
-    WALL,
-    FLOOR,
-    CEILING
-
-};
-
-
-
 void redColorValueCallback(Fl_Widget* widget, void* data)
 {
     int state = reinterpret_cast<int>(data);
     Fl_Value_Input* Widget = dynamic_cast<Fl_Value_Input*>(widget);
 
-    if (state == WALL)
+    if (state == Wall)
     {
        wallRed = Widget->value();
 
     }
-    else if (state == FLOOR)
+    else if (state == Floor)
     {
         groundRed = Widget->value();
 
     }
-    else if (state == CEILING)
+    else if (state == Ceiling)
     {
         ceilingRed =  Widget->value();
 
@@ -742,17 +713,17 @@ void greenColorValueCallback(Fl_Widget* widget, void* data)
     int state = reinterpret_cast<int>(data);
     Fl_Value_Input* Widget = dynamic_cast<Fl_Value_Input*>(widget);
 
-    if (state == WALL)
+    if (state == Wall)
     {
         wallGreen = Widget->value();
 
     }
-    else if (state == FLOOR)
+    else if (state == Floor)
     {
         groundGreen = Widget->value();
 
     }
-    else if (state == CEILING)
+    else if (state == Ceiling)
     {
         ceilingGreen = Widget->value();
 
@@ -760,23 +731,22 @@ void greenColorValueCallback(Fl_Widget* widget, void* data)
 
 }
 
-
 void blueColorValueCallback(Fl_Widget* widget, void* data)
 {
     int state = reinterpret_cast<int>(data);
     Fl_Value_Input* Widget = dynamic_cast<Fl_Value_Input*>(widget);
 
-    if (state == WALL)
+    if (state == Wall)
     {
         wallBlue = Widget->value();
 
     }
-    else if (state == FLOOR)
+    else if (state == Floor)
     {
         groundBlue= Widget->value();
 
     }
-    else if (state == CEILING)
+    else if (state == Ceiling)
     {
         ceilingBlue= Widget->value();
 
@@ -784,47 +754,6 @@ void blueColorValueCallback(Fl_Widget* widget, void* data)
 
 }
 
-/*
-void saveData(const std::string& filename)
-{
-    std::ofstream outputFile(filename);
-
-    for (size_t mapIndex = 0; mapIndex < thisSession.worldMaps.size(); ++mapIndex) {
-        outputFile << "MapIndex: " << mapIndex << " MapName: " << thisSession.mapNames[mapIndex] << std::endl;
-
-        const MapData* map = thisSession.worldMaps[mapIndex];
-
-        // Write newMap, ceilingMap, and floorMap arrays
-        for (int i = 0; i < 576; ++i)
-        {
-            outputFile << map->newMap[i] << " " << map->ceilingMap[i] << " " << map->floorMap[i] << " ";
-        }
-        outputFile << std::endl;
-
-        // Write positions
-        for (const std::vector<int>& position : map->positions) 
-        {
-            for (int val : position) {
-                outputFile << val << " ";
-            }
-            outputFile << std::endl;
-        }
-
-        // Write spriteData
-        for (const sprite& sp : map->spriteData) 
-        {
-            outputFile << sp.type << " " << sp.state << " " << sp.map << " "
-                << sp.x << " " << sp.y << " " << sp.z << " " << sp.dialogueMarker << std::endl;
-        }
-
-        outputFile << std::endl; // Separate maps
-    }
-
-    outputFile.close();
-}
-*/
-
-// Function to save data to a text file
 void saveData(const std::string& filename)
 {
     std::ofstream outFile(filename);
@@ -853,9 +782,6 @@ void saveData(const std::string& filename)
 
     outFile.close();
 }
-
-
-
 
 
 void saveButtonCallback(Fl_Widget* widget, void* Data)
@@ -897,10 +823,8 @@ void loadData(const std::string& filename)
     }
 
     inFile.close();
+    drawWorldMap();
 }
-
-
-
 
 
 void loadButtonCallback(Fl_Widget* widget, void* data)
@@ -913,7 +837,7 @@ void loadButtonCallback(Fl_Widget* widget, void* data)
 
 void designerGui()
 {
-    std::string boxLabel = "World Map";
+    const std::string boxLabel = "World Map";
 
     intializeGUI();
     Fl_Window* fltkWindow = new Fl_Window(1100, 800, "AuralEngine Editor");
@@ -1022,8 +946,6 @@ void designerGui()
     fgreenInput->label("GREEN");
     fgreenInput->align(FL_ALIGN_BOTTOM);
     fgreenInput->callback(greenColorValueCallback, reinterpret_cast<void*>(1));
-
-
 
     //save and load
     Fl_Button* saveButton = new Fl_Button(960, 500, 120, 30, "save");

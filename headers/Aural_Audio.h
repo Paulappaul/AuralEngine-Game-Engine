@@ -115,7 +115,7 @@ bool InitSoundEngine()
     AK::Comm::GetDefaultInitSettings(commSettings);
     if (AK::Comm::Init(commSettings) != AK_Success)
     {
-        assert(!"Could not initialize communication.");
+        std::cout << "Could not initialize communication." << std::endl;
         return false;
     }
     else
