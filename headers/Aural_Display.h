@@ -302,7 +302,7 @@ void mouseOFF(int button, int state, int x, int y)
 
 void init()
 {
-    loadDialogueFromFile("dialogue_data.txt", dialogueMap);
+    loadDialogueFromFile("dialogue/dialogue_data.txt", dialogueMap);
     glClearColor(0.3, 0.3, 0.3, 0);
     gluOrtho2D(0, screenWidth, screenHeight, 0);
     playerDeltaX = cos(degToRad(playerAngle));

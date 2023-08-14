@@ -597,7 +597,7 @@ void setPlayerLocation(Fl_Widget* widget, void* data)
 void dialogueRefreshCallback(Fl_Widget* widget, void* data)
 {
     dialogueMap.clear();
-    loadDialogueFromFile("dialogue_data.txt", dialogueMap);
+    loadDialogueFromFile("dialogue/dialogue_data.txt", dialogueMap);
 }
 
 std::vector<int> loadPPM(const std::string& filename)
@@ -787,7 +787,7 @@ void saveData(const std::string& filename)
 void saveButtonCallback(Fl_Widget* widget, void* Data)
 {
 
-    const std::string fileName =  "C:\\Users\\alcin\\Desktop\\testFile.txt";
+    const std::string fileName =  "savefiles/savefile.txt";
     saveData(fileName);
 
 }
@@ -829,10 +829,8 @@ void loadData(const std::string& filename)
 
 void loadButtonCallback(Fl_Widget* widget, void* data)
 {
-    std::string fileName = "C:\\Users\\alcin\\Desktop\\testFile.txt";
+    std::string fileName = "savefiles/savefile.txt";
     loadData(fileName);
-
-
 }
 
 void designerGui()

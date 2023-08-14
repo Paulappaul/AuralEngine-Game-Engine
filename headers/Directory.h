@@ -53,10 +53,11 @@
 #include <FL/Fl_File_Chooser.H>
 
 //Graphics
-#include "Metal.ppm"
-#include "All_Textures1.ppm"
-#include "sky.ppm"
-#include "sprites.ppm"
+#include "images/Metal.ppm"
+#include "images/All_Textures1.ppm"
+#include "images/sky.ppm"
+#include "images/sprites.ppm"
+
 
 /*******************************************************************************************GLOBAL VARIABLES*****************************************************************************************************/
 
