@@ -53,10 +53,12 @@
 #include <FL/Fl_File_Chooser.H>
 
 //Graphics
-#include "images/Metal.ppm"
-#include "images/All_Textures1.ppm"
+#include "images/ceilingTextures.ppm"
+#include "images/floorTextures.ppm"
+#include "images/wallTextures.ppm"
 #include "images/sky.ppm"
 #include "images/sprites.ppm"
+
 
 
 /*******************************************************************************************GLOBAL VARIABLES*****************************************************************************************************/
@@ -219,6 +221,7 @@ typedef struct          //All veriables per sprite
     int map;            //texture to show
     float x, y, z;      //position
     int dialogueMarker;
+    int dialogueGraphic; 
 }sprite;
 
 enum EVENTS

@@ -7,12 +7,16 @@
 
 struct MapData
 {
+    int mapPlayerLocationX = playerX;
+    int mapPlayerLocationY = playerY;
+
     int newMap[576] = { 0 };        // Initialize all elements to 0
     int ceilingMap[576] = { 0 };    // Initialize all elements to 0
     int floorMap[576] = { 0 };      // Initialize all elements to 0
     std::vector<std::vector<int>> positions; // Vector to store X, Y, PlayerX, PlayerY, and destination map index
     std::vector<sprite>spriteData;
     std::vector<int> ppmData;
+    std::vector<int> DialogueGraphic;
     // Function to add a new position to the positions vector
 
     void addPosition(int x, int y, int playerX, int playerY, int destinationMapIndex, int eventFLAG)
@@ -321,7 +325,11 @@ void newWorldMap(Fl_Widget* widget, void* data)
         thisSession.currentMap = thisSession.worldMaps.size() - 1; // Set the index to the new map
         thisSession.mapNames.push_back(newMapName);
 
-        skynew = false;
+        skynew = false; // ??
+
+        playerX = thisSession.worldMaps[thisSession.currentMap]->mapPlayerLocationX;
+        playerY = thisSession.worldMaps[thisSession.currentMap]->mapPlayerLocationY;
+        
         drawWorldMap();
        
       gameState = threeDimensionalDisplay;
@@ -430,6 +438,9 @@ void mapBackCallback(Fl_Widget* widget, void* data)
         thisSession.currentMap--;
 
         thisSession.mapLabel->copy_label(strdup(thisSession.mapNames.at(thisSession.currentMap).c_str()));
+        playerX = thisSession.worldMaps[thisSession.currentMap]->mapPlayerLocationX;
+        playerY = thisSession.worldMaps[thisSession.currentMap]->mapPlayerLocationY;
+        std::cout << playerX << playerY << std::endl;
         drawWorldMap();
     }
     else
@@ -447,6 +458,10 @@ void mapForwardCallback(Fl_Widget* widget, void* data)
 
         // Fetch the label from the mapNames vector at the current index and update the button label
         thisSession.mapLabel->copy_label(thisSession.mapNames.at(thisSession.currentMap).c_str());
+
+        playerX = thisSession.worldMaps[thisSession.currentMap]->mapPlayerLocationX;
+        playerY = thisSession.worldMaps[thisSession.currentMap]->mapPlayerLocationY;
+        std::cout << playerX << playerY << std::endl;
         drawWorldMap();
     }
     else
@@ -585,19 +600,54 @@ void dialogueEventCallback(Fl_Widget* widget, void* data)
     popUpWindow->show();
 }
 
+struct smugglePlayerLocation
+{
+    Fl_Input* xInput;
+    Fl_Input* yInput;
+
+};
+
+void playerLocationCallback(Fl_Widget* widget, void* data)
+{
+    smugglePlayerLocation* passedSmuggle = static_cast<smugglePlayerLocation*>(data);
+
+    int x = std::atoi(passedSmuggle->xInput->value());
+    int y = std::atoi(passedSmuggle->yInput->value());
+
+    std::cout << "x: " << x << " y: " << y << std::endl;
+
+    thisSession.worldMaps[thisSession.currentMap]->mapPlayerLocationX = x;
+    thisSession.worldMaps[thisSession.currentMap]->mapPlayerLocationY = y;
+
+    // Close the popup window
+    Fl_Window* popUpWindow = static_cast<Fl_Window*>(widget->parent());
+    popUpWindow->hide();
+
+    delete passedSmuggle;
+}
 
 void setPlayerLocation(Fl_Widget* widget, void* data)
 {
+    smugglePlayerLocation* smuggle = new smugglePlayerLocation;
 
+    Fl_Window* popUpWindow = new Fl_Window(500, 300, "set Player Location");
 
+    smuggle->xInput = new Fl_Input(150, 50, 100, 30, "X:");
+    smuggle->yInput = new Fl_Input(150, 90, 100, 30, "Y:");
 
+    Fl_Button* confirmButton = new Fl_Button(250, 130, 100, 30, "Confirm");
+    confirmButton->callback(playerLocationCallback, smuggle);
+
+    popUpWindow->end();
+    popUpWindow->show();
 }
+
 
 
 void dialogueRefreshCallback(Fl_Widget* widget, void* data)
 {
     dialogueMap.clear();
-    loadDialogueFromFile("dialogue/dialogue_data.txt", dialogueMap);
+    loadDialogueFromFile("dialogue/saveFile.txt", dialogueMap);
 }
 
 std::vector<int> loadPPM(const std::string& filename)
@@ -848,9 +898,9 @@ void designerGui()
 
     drawWorldMap();
 
-    textureButtons(600, 24, 7, Wall);
-    textureButtons(720, 24, 6, Ceiling);
-    textureButtons(840, 24, 6, Floor);
+    textureButtons(600, 24, 9, Wall);
+    textureButtons(720, 24, 9, Ceiling);
+    textureButtons(840, 24, 9, Floor);
 
     Fl_Button* newMap = new Fl_Button(216, 675, 192, 75, "New Map");
     newMap->callback(newWorldMap);
@@ -883,45 +933,47 @@ void designerGui()
     Fl_Button* newSkyButton = new Fl_Button(960,174,120,30, "New Sky");
     newSkyButton->callback(newSkyCallback);
 
-    Fl_Button* protoTyping_Textures = new Fl_Button(720, 204, 240, 30, "Prototyping Textures");
+
+    //
+    Fl_Button* protoTyping_Textures = new Fl_Button(720, 294, 240, 30, "Prototyping Textures");
     protoTyping_Textures->callback(protoTexCallback);
 
-    Fl_Button* solidColorTextures = new Fl_Button(960, 204, 120, 30, "Solid Color");
+    Fl_Button* solidColorTextures = new Fl_Button(960, 294, 120, 30, "Solid Color");
     solidColorTextures->callback(solidColorCallback);    
 
     //SKY
-    Fl_Box* Skylabel = new Fl_Box(600, 234, 120, 30, "SKY:");
+    Fl_Box* Skylabel = new Fl_Box(600, 324, 120, 30, "SKY:");
 
-    Fl_Value_Input* redInput = new Fl_Value_Input(720, 234, 120, 30);
+    Fl_Value_Input* redInput = new Fl_Value_Input(720, 324, 120, 30);
     redInput->label("RED");
     redInput->align(FL_ALIGN_BOTTOM);
     redInput->soft(true);
     redInput->callback(redColorValueCallback, reinterpret_cast<void*>(2));
 
-    Fl_Value_Input* blueInput = new Fl_Value_Input(840, 234, 120, 30);
+    Fl_Value_Input* blueInput = new Fl_Value_Input(840, 324, 120, 30);
     blueInput->label("BLUE");
     blueInput->align(FL_ALIGN_BOTTOM);
     blueInput->callback(blueColorValueCallback, reinterpret_cast<void*>(2));
 
-    Fl_Value_Input* greenInput = new Fl_Value_Input(960, 234, 120, 30);
+    Fl_Value_Input* greenInput = new Fl_Value_Input(960, 324, 120, 30);
     greenInput->label("GREEN");
     greenInput->align(FL_ALIGN_BOTTOM);
     greenInput->callback(greenColorValueCallback, reinterpret_cast<void*>(2));
 
     //Wall
-    Fl_Box* wallLabel = new Fl_Box(600, 264, 120, 30, "WALL:");
+    Fl_Box* wallLabel = new Fl_Box(600, 354, 120, 30, "WALL:");
 
-    Fl_Value_Input* wredInput = new Fl_Value_Input(720, 264, 120, 30);
+    Fl_Value_Input* wredInput = new Fl_Value_Input(720, 354, 120, 30);
     wredInput->label("RED");
     wredInput->align(FL_ALIGN_BOTTOM);
     wredInput->callback(redColorValueCallback, reinterpret_cast<void*>(0));
 
-    Fl_Value_Input* wblueInput = new Fl_Value_Input(840, 264, 120, 30);
+    Fl_Value_Input* wblueInput = new Fl_Value_Input(840, 354, 120, 30);
     wblueInput->label("BLUE");
     wblueInput->align(FL_ALIGN_BOTTOM);
     wblueInput->callback(blueColorValueCallback, reinterpret_cast<void*>(0));
 
-    Fl_Value_Input* wgreenInput = new Fl_Value_Input(960, 264, 120, 30);
+    Fl_Value_Input* wgreenInput = new Fl_Value_Input(960, 354, 120, 30);
     wgreenInput->label("GREEN");
     wgreenInput->align(FL_ALIGN_BOTTOM);
     wgreenInput->callback(greenColorValueCallback, reinterpret_cast<void*>(0));
@@ -929,18 +981,18 @@ void designerGui()
     //Floor
     Fl_Box* floorLabel = new Fl_Box(600, 294, 120, 30, "FLOOR:");
 
-    Fl_Value_Input* fredInput = new Fl_Value_Input(720, 294, 120, 30);
+    Fl_Value_Input* fredInput = new Fl_Value_Input(720, 384, 120, 30);
     fredInput->label("RED");
     fredInput->align(FL_ALIGN_BOTTOM);
     fredInput->callback(redColorValueCallback);
     fredInput->callback(redColorValueCallback, reinterpret_cast<void*>(1));
 
-    Fl_Value_Input* fblueInput = new Fl_Value_Input(840, 294, 120, 30);
+    Fl_Value_Input* fblueInput = new Fl_Value_Input(840, 384, 120, 30);
     fblueInput->label("BLUE");
     fblueInput->align(FL_ALIGN_BOTTOM);
     fblueInput->callback(blueColorValueCallback, reinterpret_cast<void*>(1));
 
-    Fl_Value_Input* fgreenInput = new Fl_Value_Input(960, 294, 120, 30);
+    Fl_Value_Input* fgreenInput = new Fl_Value_Input(960, 384, 120, 30);
     fgreenInput->label("GREEN");
     fgreenInput->align(FL_ALIGN_BOTTOM);
     fgreenInput->callback(greenColorValueCallback, reinterpret_cast<void*>(1));

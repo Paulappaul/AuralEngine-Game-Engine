@@ -4,7 +4,7 @@
 
 //controls which dialogue is written to the screen, passed to dialogueMap
 int dialogueEventLocator = 0;
-int dialogueGraphicLocator = 0;
+
 
 int depth[120];      //hold wall line depth to compare for sprite depth
 
@@ -165,7 +165,7 @@ void text()
     // The font to be used for rendering the text
     void* font = GLUT_BITMAP_TIMES_ROMAN_24;
 
-    //  void* font = GLUT_BITMAP_TIMES_ROMAN_10;
+  //  void* font = GLUT_BITMAP_TIMES_ROMAN_10;
 
 
     std::string currentDialogue = dialogueMap[dialogueEventLocator];
@@ -278,7 +278,7 @@ void mouseClick(int button, int state, int x, int y)
     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
     {
         std::cout << screenHeight << std::endl;
-
+        
             // Convert mouse coordinates to map coordinates
             int mouseX = x / XSize;
             int mouseY = y / ((screenHeight -240)/24) ;
@@ -288,7 +288,7 @@ void mouseClick(int button, int state, int x, int y)
             Map[mouseY * mapX + mouseX] = (Map[mouseY * mapX + mouseX] == 0) ? 1 : 0;
 
             std::cout << Map[mouseY * mapX + mouseX] << std::endl;
-
+        
     }
 }
 */
@@ -308,33 +308,15 @@ void init()
     playerDeltaX = cos(degToRad(playerAngle));
     playerDeltaY = -sin(degToRad(playerAngle));
 
-    std::string ppmFilenames[4] = 
-    {
-        "images/image1.ppm",
-        "images/image2.ppm",
-        "images/image3.ppm",
-        "images/image4.ppm"
-    };
-
-    for (const std::string& filename : ppmFilenames)
-    {
-        std::vector<int> ppmImageData = loadPPM(filename);
-
-        thisSession.worldMaps[thisSession.currentMap]->DialogueGraphic.insert(
-            thisSession.worldMaps[thisSession.currentMap]->DialogueGraphic.end(),
-            ppmImageData.begin(), ppmImageData.end());
-    }
-
-
     // Initialize the spriteData vector in the current MapData instance
-   thisSession.worldMaps.at(thisSession.currentMap)->spriteData =
+  /* thisSession.worldMaps.at(thisSession.currentMap)->spriteData =
     {
-        {1, 1, 0, 10 * 64, 10 * 64, 20, 0, 0}, // key
-        {2, 1, 1, 1.5 * 64, 4.5 * 64, 20,1, 1}, // light 1
-        {2, 1, 1, 3.5 * 64, 4.5 * 64, 20,2, 2}, // light 2
-        {3, 1, 2, 2.5 * 64, 2 * 64, 20, 3 , 3} // enemy
+        {1, 1, 0, 10 * 64, 10 * 64, 20, 0}, // key
+        {2, 1, 1, 1.5 * 64, 4.5 * 64, 20,1}, // light 1
+        {2, 1, 1, 3.5 * 64, 4.5 * 64, 20,2}, // light 2
+        {3, 1, 2, 2.5 * 64, 2 * 64, 20, 3} // enemy
     };
-    
+    */
 }
 
 
@@ -347,24 +329,24 @@ void resize(int w, int h)
 
 void drawFloorCeilingSolidColor()
 {
-
-    glColor3f(ceilingRed, ceilingGreen, ceilingBlue);
-    glBegin(GL_QUADS);
-    glVertex2i(0, screenHeight / 2);
-    glVertex2i(screenWidth, screenHeight / 2);
-    glVertex2i(screenWidth, 0);
-    glVertex2i(0, 0);
-    glEnd();
-
-    //floor
-    glColor3f(groundRed, groundBlue, groundGreen);
-    glBegin(GL_QUADS);
-    glVertex2i(0, screenHeight);
-    glVertex2i(screenWidth, screenHeight);
-    glVertex2i(screenWidth, screenHeight / 2);
-    glVertex2i(0, screenHeight / 2);
-    glEnd();
-
+    
+        glColor3f(ceilingRed, ceilingGreen, ceilingBlue);
+        glBegin(GL_QUADS);
+        glVertex2i(0, screenHeight /2);
+        glVertex2i(screenWidth, screenHeight /2);
+        glVertex2i(screenWidth, 0);
+        glVertex2i(0, 0);
+        glEnd();
+        
+        //floor
+        glColor3f(groundRed, groundBlue, groundGreen);
+        glBegin(GL_QUADS);
+        glVertex2i(0, screenHeight);
+        glVertex2i(screenWidth, screenHeight);
+        glVertex2i(screenWidth, screenHeight/2);
+        glVertex2i(0, screenHeight/2);
+        glEnd();
+        
 }
 
 void drawRays2D()
@@ -493,7 +475,7 @@ void drawRays2D()
             rayX = verticalX;
             rayY = verticalY;
             disH = disV;
-            glColor3f(wallRed - 0.2, wallGreen - 0.2, wallBlue - 0.2); // shade color
+            glColor3f(wallRed -0.2, wallGreen -0.2, wallBlue -0.2); // shade color
         }
 
         ///*******************2D Map Rav Visualizer*******************///
@@ -509,7 +491,7 @@ void drawRays2D()
         int ca = fixAngle(playerAngle - rayAngle);
         disH = disH * cos(degToRad(ca));                             // Fix fisheye
         int lineH = (mapSquareSize * screenHeight) / disH;
-        float ty_step = 64.0 / static_cast<float>(lineH);
+        float ty_step = 32.0 / static_cast<float>(lineH);
         float ty_off = 0;
 
         if (lineH > screenHeight)                                    // Line height and limit
@@ -522,69 +504,54 @@ void drawRays2D()
 
         depth[ray] = disH;                                           //save line depth for Sprites
 
-        // --------------------------------------------------------------------------------------Draw walls--------------------------------------------------------------------------------------------------------------- //
-
-        //Setup
+        // -----------------------Draw walls------------------------ //
         int y;
-        float ty = ty_off * ty_step;
-        float tx = 0;
-        int textureSize = 0;
-        int textureLimiter = 0;
-
-        if (prototypeTexture == false) { textureSize = 64; textureLimiter = 63; }
-        else { textureSize = 32; textureLimiter = 31; }
-
-
-        if (prototypeTexture == true)
-        {
-            ty = ty_off * ty_step + hmt * 32;
+        float ty = ty_off * ty_step; //+ hmt * 32;
+      
+        if(prototypeTexture == true)
+        { 
+        ty = ty_off * ty_step + hmt * 32;
         }
+        
+        float tx;
 
         if (shade == 0.5)
         {
-            tx = static_cast<int>(rayX) % textureSize;
-            if (rayAngle > 180)
-            {
-                tx = textureLimiter - tx;
-            }
+            tx = static_cast<int>(rayX / 2.0) % 32;
+            if (rayAngle > 180) { tx = 31 - tx; }
         }
         else
         {
-            tx = static_cast<int>(rayY) % textureSize;
+            tx = static_cast<int>(rayY / 2.0) % 32;
             if (rayAngle > 90 && rayAngle < 270)
             {
-                tx = textureLimiter - tx;
+                tx = 31 - tx;
             }
         }
 
+        // -- Three Modes: Textured, ProtoType Texture, Solid Colors -- //
 
-
-        // ---------------------------------------------------------------- Three Modes: Textured, ProtoType Texture, Solid Colors -------------------------------------------------------------------------------------- //
-
-
-        //ProtoType Textures Draw
         for (y = 0; y < lineH; y++)
         {
-            if (prototypeTexture == true)
-            {
+            if(prototypeTexture == true)
+            { 
 
-
+                //Code for Prototyping Textures
+                //add Back + hmt 32 above
                 float c = All_Textures[static_cast<int>(ty) * 32 + static_cast<int>(tx)] * shade;
                 if (hmt == 0) { glColor3f(c, c / 2.0, c / 2.0); }                                // Checkerboard red
                 if (hmt == 1) { glColor3f(c, c, c / 2.0); }                                      // Brick yellow
                 if (hmt == 2) { glColor3f(c / 2.0, c / 2.0, c); }                                // Window blue
                 if (hmt == 3) { glColor3f(c / 2.0, c, c / 2.0); }                                // Door green
-
+               
                 glBegin(GL_POINTS);
                 glVertex2i(ray * 16, y + lineOff);
                 glEnd();
                 ty += ty_step;
             }
-
-            //Solid Color Draw
             else if (drawSolidColorTextures == true)
             {
-
+                
 
                 glLineWidth(16);
                 glBegin(GL_LINES);
@@ -592,28 +559,22 @@ void drawRays2D()
                 glVertex2i(ray * 16, lineOff + lineH);
                 glEnd();
 
+
             }
-            //Draw 64X64 textures
             else
             {
-
-                ty = (ty_off + y) * ty_step + hmt * 64;
-
-                // Code for Textured surfaces with 64x64 textures
-                int pixel = ((static_cast<int>(ty) & 63) * 64 + (static_cast<int>(tx) & 63)) * 3 + hmt * 64 * 64 * 3;
-
-                int red =   wallTextures[pixel + 0] * shade;
-                int green = wallTextures[pixel + 1] * shade;
-                int blue =  wallTextures[pixel + 2] * shade;
-
+                //Code for Textured surfaces
+                //also dont forget to strike * hmt 32 above
+                int pixel = ((int)ty * 32 + (int)tx) * 3 + (hmt * 32 * 32 * 3);         // 32 32 *3 represents number of pictures in each texture
+                int red = ALL_TEXTURES1[pixel + 0] * shade;
+                int green = ALL_TEXTURES1[pixel + 1] * shade;
+                int blue = ALL_TEXTURES1[pixel + 2] * shade;
                 glPointSize(16);
                 glColor3b(red, green, blue);
 
                 glBegin(GL_POINTS);
                 glVertex2i(ray * 16, y + lineOff);
                 glEnd();
-
-                // Increment texture coordinate for the next row using 64x64 texture size
                 ty += ty_step;
             }
         }
@@ -625,48 +586,49 @@ void drawRays2D()
             float dy = y - (screenHeight / 2.0);
             float deg = degToRad(rayAngle);
             float raFix = cos(degToRad(fixAngle(playerAngle - rayAngle)));
-            tx = playerX / 2 + cos(deg) * 158 * 2 * 64 / dy / raFix; // Use 64 for texture size
-            ty = playerY / 2 - sin(deg) * 158 * 2 * 64 / dy / raFix; // Use 64 for texture size
+            tx = playerX / 2 + cos(deg) * 158 * 2 * 64 / dy / raFix;                    // determines floor and ceiling tile size
+            ty = playerY / 2 - sin(deg) * 158 * 2 * 64 / dy / raFix;
+
 
 
             // ------------------------Draw floors---------------------------//
 
-            if (prototypeTexture == true)
-            {
-                // Ensure ty and tx are within the valid range of texture indices (0 to 255)
-                int tyIndex = static_cast<int>(ty / 96.0);
-                int txIndex = static_cast<int>(tx / 96.0);
+            if(prototypeTexture == true)
+            {            
+             // Ensure ty and tx are within the valid range of texture indices (0 to 255)
+            int tyIndex = static_cast<int>(ty / 96.0);
+            int txIndex = static_cast<int>(tx / 96.0);
 
-                // Clamp ty and tx to valid range
-                if (tyIndex < 0) tyIndex = 0;
-                if (tyIndex >= 256) tyIndex = 255;
-                if (txIndex < 0) txIndex = 0;
-                if (txIndex >= 256) txIndex = 255;
+            // Clamp ty and tx to valid range
+            if (tyIndex < 0) tyIndex = 0;
+            if (tyIndex >= 256) tyIndex = 255;
+            if (txIndex < 0) txIndex = 0;
+            if (txIndex >= 256) txIndex = 255;
 
-                int mp = mapFloor[tyIndex * mapX + txIndex] * 32 * 32;
-                float c = All_Textures[((int)(ty) & 31) * 32 + ((int)(tx) & 31) + mp] * 0.7;
-
-                glColor3f(c / 1.3, c / 1.3, c);
-                glPointSize(24);
-                glBegin(GL_POINTS);
-                glVertex2i(ray * 24, y);
-                glEnd();
-
-                mp = mapCeiling[tyIndex * mapX + txIndex] * 32 * 32;
-                c = All_Textures[(static_cast<int>(ty) & 31) * 32 + (static_cast<int>(tx) & 31) + mp] * 0.7;
-                glColor3f(c / 2.0, c / 1.2, c / 2.0);
-                glPointSize(24);
-                glBegin(GL_POINTS);
-                glVertex2i(ray * 24, screenHeight - y);
-                glEnd();
-
+            int mp = mapFloor[tyIndex * mapX + txIndex] * 32 *32;
+            float c = All_Textures[((int)(ty) & 31) * 32 + ((int)(tx) & 31) + mp] * 0.7;
+           
+            glColor3f(c / 1.3, c / 1.3, c);
+            glPointSize(24);
+            glBegin(GL_POINTS);
+            glVertex2i(ray * 24, y);
+            glEnd();
+            
+            mp = mapCeiling[tyIndex * mapX + txIndex] * 32 * 32;
+            c = All_Textures[(static_cast<int>(ty) & 31) * 32 + (static_cast<int>(tx) & 31) + mp] * 0.7;
+            glColor3f(c / 2.0, c / 1.2, c / 2.0);
+            glPointSize(24);
+            glBegin(GL_POINTS);
+            glVertex2i(ray * 24, screenHeight - y);
+            glEnd();
+            
             }
-            else if (drawSolidColorTextures == true)
+            else if(drawSolidColorTextures == true)
             {
-
-
-
-
+            
+              
+            
+            
             }
             else
             {
@@ -674,9 +636,9 @@ void drawRays2D()
                 float c = All_Textures[(static_cast<int>(ty) & 31) * 32 + (static_cast<int>(tx) & 31) + mp] * 0.7;                          // moving 32 spaces moves to the next tile set
 
                 int pixel = (((int)(ty) & 31) * 32 + ((int)(tx) & 31)) * 3 + mp * 3;                                                        // 32 32 *3 represents number of pictures in each texture
-                int red =   floorTextures[pixel + 0] * 0.25;
-                int green = floorTextures[pixel + 1] * 0.25;
-                int blue =  floorTextures[pixel + 2] * 0.25;
+                int red = ALL_TEXTURES1[pixel + 0] * 0.25;
+                int green = ALL_TEXTURES1[pixel + 1] * 0.25;
+                int blue = ALL_TEXTURES1[pixel + 2] * 0.25;
                 glPointSize(16);
                 glColor3b(red, green, blue);
                 glBegin(GL_POINTS);
@@ -686,9 +648,9 @@ void drawRays2D()
                 // -----------------------------------------------------Draw ceiling-------------------------------------------------------- //
                 int mpCeiling = thisSession.worldMaps[thisSession.currentMap]->ceilingMap[(int)(ty / 32.0) * mapX + (int)(tx / 32.0)] * 32 * 32;
                 pixel = (((int)(ty) & 31) * 32 + ((int)(tx) & 31)) * 3 + mpCeiling * 3;                                                     // 32 32 *3 represents number of pictures in each texture
-                red =   ceilingTextures[pixel + 0] * 0.25;
-                green = ceilingTextures[pixel + 1] * 0.25;
-                blue =  ceilingTextures[pixel + 2] * 0.25;
+                red = ALL_TEXTURES1[pixel + 0] * 0.25;
+                green = ALL_TEXTURES1[pixel + 1] * 0.25;
+                blue = ALL_TEXTURES1[pixel + 2] * 0.25;
                 if (mpCeiling > 0) // else we Drawing the Sky.
                 {
                     glPointSize(16);
@@ -697,8 +659,8 @@ void drawRays2D()
                     glVertex2i(ray * 16, screenHeight - y);
                     glEnd();
                 }
-            
             }
+            
 
         }
 
@@ -754,53 +716,37 @@ void drawSky()     //draw sky and rotate based on player rotation
     }
 
 }
+
 void drawDialogueImage()
 {
-    if (dialogueGraphicLocator < 0 || dialogueGraphicLocator >= thisSession.worldMaps[thisSession.currentMap]->DialogueGraphic.size())
-    {
-        // Invalid index, return or handle the error
-        return;
-    }
 
-    const std::vector<int>& dialogueGraphic = thisSession.worldMaps[thisSession.currentMap]->DialogueGraphic;
-
-    // Calculate the starting index of the selected image in the dialogueGraphic vector
-    int startingIndex = dialogueGraphicLocator * (32 * 32 * 3);
-
+    //First we draw the Character image
+    //int a b
     for (int A = 0; A < 32; A++)
     {
         for (int B = 0; B < 32; B++)
         {
+
             glPointSize(24);
 
-            // Rotate the image counterclockwise by 270 degrees, flip it horizontally, and flip it vertically
-            int pixel = startingIndex + (A * 32 + (31 - B)) * 3;  // Find where we are in the image ppm
-            int red = dialogueGraphic[pixel + 0];    // Copy the color value
-            int green = dialogueGraphic[pixel + 1];
-            int blue = dialogueGraphic[pixel + 2];
+            int pixel = (B * 32 + A) * 3;      //finds where we are in the image ppm
+            int red = T_1[pixel + 0];        //copies the color value, there are 3 color values we need to draw for each pixel
+            int green = T_1[pixel + 1];
+            int blue = T_1[pixel + 2];
 
             glColor3ub(red, green, blue);
             glBegin(GL_POINTS);
             glVertex2f(B * 8 + 1550, A * 8 + 875);
             glEnd();
+
         }
+
     }
+
+
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-void dialogue(float* fps)
+void dialogue(float *fps)
 {
     if (gameState == dialogueEvent)
     {
@@ -825,7 +771,7 @@ void dialogue(float* fps)
 
             drawDialogueImage();
             //then we draw the Square and then the text; 
-
+            
             text();
         }
 
@@ -854,7 +800,7 @@ void loadScreenTimerCallback(int value)
 void loadBlackScreen()
 {
     drawSquare(0, screenWidth, 0, screenHeight);
-
+    
     // Display the load screen content
     drawSquare(0, screenWidth, 0, screenHeight);
 
@@ -864,7 +810,7 @@ void loadBlackScreen()
         glutTimerFunc(1000, loadScreenTimerCallback, 0);
         loadScreenTimerSet = true;
     }
-
+    
 }
 
 void movementLogic()
@@ -917,16 +863,16 @@ void movementLogic()
 
             if (currentTileY * mapX + nextTileXWithXOffset == Y * mapX + X)                     // if there is a collision, we check it flags for the kind of Event Collision 
             {
-                if (position[5] == Portal)
-                {
-                    gameState = FREEZE;
-                    playerX = position[2] * 64;
-                    playerY = position[3] * 64;
-                    thisSession.currentMap = position[4]; // Update the current map index to the destination map index
-                    thisSession.mapLabel->copy_label(strdup(thisSession.mapNames.at(thisSession.currentMap).c_str()));
-                    drawWorldMap();
-                    gameState = threeDimensionalDisplay;
-                    return; // Exit the function after teleporting to prevent further movement checks
+                if(position[5] == Portal)
+                { 
+                   gameState = FREEZE;
+                   playerX = position[2] * 64;
+                   playerY = position[3] * 64;
+                   thisSession.currentMap = position[4]; // Update the current map index to the destination map index
+                   thisSession.mapLabel->copy_label(strdup(thisSession.mapNames.at(thisSession.currentMap).c_str()));
+                   drawWorldMap();
+                   gameState = threeDimensionalDisplay;
+                   return; // Exit the function after teleporting to prevent further movement checks
                 }
                 else if (position[5] == Dialogue)
                 {
@@ -992,83 +938,83 @@ void movementLogic()
 void display()
 {
 
-    if (gameState != FREEZE)
+    if(gameState != FREEZE)
     {
-        // Calculate frames per second
-        frame2 = glutGet(GLUT_ELAPSED_TIME);
-        fps = (frame2 - frame1);
-        frame1 = glutGet(GLUT_ELAPSED_TIME);
+    // Calculate frames per second
+    frame2 = glutGet(GLUT_ELAPSED_TIME);
+    fps = (frame2 - frame1);
+    frame1 = glutGet(GLUT_ELAPSED_TIME);
+
+   
+
+    //Player Rotation 
+    if (Keys.turnLeft == 1)
+    {
+        playerAngle += 0.08 * fps;
+        playerAngle = fixAngle(playerAngle);
+        playerDeltaX = cos(degToRad(playerAngle));
+        playerDeltaY = -sin(degToRad(playerAngle));
+
+        // Debugging: Print player movement info
+        std::cout << "Player is turning left." << std::endl;
+        std::cout << "Player Angle: " << playerAngle << std::endl;
+        std::cout << "Delta X and Delta Y value: " << playerDeltaX << " " << playerDeltaY << std::endl;
+        std::cout << "Player X and Player Y: " << playerX << " " << playerY << std::endl;
+    }
+
+    if (Keys.turnRight == 1)
+    {
+        playerAngle -= 0.08 * fps;
+        playerAngle = fixAngle(playerAngle);
+        playerDeltaX = cos(degToRad(playerAngle));
+        playerDeltaY = -sin(degToRad(playerAngle));
+
+        // Debugging: Print player movement info
+        std::cout << "Player is turning right." << std::endl;
+        std::cout << "Player Angle: " << playerAngle << std::endl;
+        std::cout << "Delta X and Delta Y value: " << playerDeltaX << " " << playerDeltaY << std::endl;
+        std::cout << "Player X and Player Y: " << playerX << " " << playerY << std::endl;
+    }
 
 
+    movementLogic();
 
-        //Player Rotation 
-        if (Keys.turnLeft == 1)
+
+    glutPostRedisplay();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    
+    if (gameState == loadScreen)
+    {
+
+        loadBlackScreen();
+
+    }
+    else if (gameState == twoDimensionalDisplay)
+    {
+       // glutMouseFunc(mouseClick);
+        drawMap2D();
+        drawPlayer2D();     
+
+    }
+    else
+    {
+        if (drawSolidColorTextures == false)
         {
-            playerAngle += 0.08 * fps;
-            playerAngle = fixAngle(playerAngle);
-            playerDeltaX = cos(degToRad(playerAngle));
-            playerDeltaY = -sin(degToRad(playerAngle));
-
-            // Debugging: Print player movement info
-            std::cout << "Player is turning left." << std::endl;
-            std::cout << "Player Angle: " << playerAngle << std::endl;
-            std::cout << "Delta X and Delta Y value: " << playerDeltaX << " " << playerDeltaY << std::endl;
-            std::cout << "Player X and Player Y: " << playerX << " " << playerY << std::endl;
+            drawSky();                              //glitch caused by this. 
         }
-
-        if (Keys.turnRight == 1)
+        drawRays2D();
+        glutMouseFunc(mouseOFF);
+        if (!thisSession.worldMaps.at(thisSession.currentMap)->spriteData.empty())
         {
-            playerAngle -= 0.08 * fps;
-            playerAngle = fixAngle(playerAngle);
-            playerDeltaX = cos(degToRad(playerAngle));
-            playerDeltaY = -sin(degToRad(playerAngle));
-
-            // Debugging: Print player movement info
-            std::cout << "Player is turning right." << std::endl;
-            std::cout << "Player Angle: " << playerAngle << std::endl;
-            std::cout << "Delta X and Delta Y value: " << playerDeltaX << " " << playerDeltaY << std::endl;
-            std::cout << "Player X and Player Y: " << playerX << " " << playerY << std::endl;
+            drawSprite();
         }
-
-
-        movementLogic();
-
-
-        glutPostRedisplay();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-
-        if (gameState == loadScreen)
+        if (gameState == dialogueEvent)
         {
-
-            loadBlackScreen();
-
+            dialogue(&fps);
         }
-        else if (gameState == twoDimensionalDisplay)
-        {
-            // glutMouseFunc(mouseClick);
-            drawMap2D();
-            drawPlayer2D();
-
-        }
-        else
-        {
-            if (drawSolidColorTextures == false)
-            {
-                drawSky();                              //glitch caused by this. 
-            }
-            drawRays2D();
-            glutMouseFunc(mouseOFF);
-            if (!thisSession.worldMaps.at(thisSession.currentMap)->spriteData.empty())
-            {
-                drawSprite();
-            }
-            if (gameState == dialogueEvent)
-            {
-                dialogue(&fps);
-            }
-        }
-
+      }
+    
         glutSwapBuffers();
     }
 }
@@ -1132,9 +1078,7 @@ void ButtonDown(unsigned char key, int x, int y)
                     std::cout << "dialogue Event Triggered!" << std::endl;
                     textLengthReach = false;
                     numCharsRendered = 0;
-
                     dialogueEventLocator = thisSession.worldMaps.at(thisSession.currentMap)->spriteData[i].dialogueMarker;
-                    dialogueGraphicLocator = thisSession.worldMaps.at(thisSession.currentMap)->spriteData[i].dialogueGraphic;
                     gameState = dialogueEvent;
                     return; // Exit the function after triggering the dialogue event
                 }
@@ -1195,7 +1139,7 @@ void ButtonDown(unsigned char key, int x, int y)
         if (thisSession.worldMaps[thisSession.currentMap]->newMap[nextTileYWithYOffset * mapX + nextTileXWithXOffset] == 6)
         {
             thisSession.worldMaps[thisSession.currentMap]->newMap[nextTileYWithYOffset * mapX + nextTileXWithXOffset] = 0;
-
+            
         }
     }
 
